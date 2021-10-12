@@ -11,6 +11,7 @@ Vue.use(VueRouter);
 import categoreis from './pages/categoreis/index'
 import create_category from './pages/categoreis/create'
 import products from './pages/products/index'
+import create_product from './pages/products/create'
 
 const router = new VueRouter({
     routes:[ {
@@ -25,6 +26,10 @@ const router = new VueRouter({
         path: '/category/create',
         name: 'create_category',
         component: create_category
+      },{ 
+        path: '/product/create',
+        name: 'create_product',
+        component: create_product
       }]
 })
 
