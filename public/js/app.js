@@ -2105,19 +2105,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
-      selected_categorie: ''
+      parent_category: ''
     };
   },
   methods: {
     categorie_selected: function categorie_selected() {
-      this.$store.dispatch('category_store/new_category_parent_selected', this.selected_categorie);
+      this.$store.dispatch('category_store/new_category_parent_selected', this.parent_category);
+    },
+    Add_category: function Add_category() {
+      this.$store.dispatch('category_store/Add_new_category');
     }
   },
   computed: {
@@ -2129,7 +2128,15 @@ __webpack_require__.r(__webpack_exports__);
         this.$store.dispatch('category_store/set_new_category_name', new_value);
         console.log('hello');
       }
+    },
+    categoreis: {
+      get: function get() {
+        return this.$store.state.category_store.categoreis;
+      }
     }
+  },
+  created: function created() {
+    this.$store.dispatch('category_store/get_categoreis');
   }
 });
 
@@ -2153,7 +2160,31 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  computed: {
+    categoreis: {
+      get: function get() {
+        return this.$store.state.category_store.categoreis;
+      }
+    }
+  }
+});
 
 /***/ }),
 
@@ -2377,31 +2408,49 @@ __webpack_require__.r(__webpack_exports__);
 
 var state = {
   category_name: "",
-  category_parent: null
+  category_parent: null,
+  categoreis: Array()
 };
 var mutations = {
   set_new_category_name: function set_new_category_name(state, category_name) {
     state.category_name = category_name;
-    console.log('category name in store == ', state.category_name);
-    console.log('category name in store == ', category_name);
   },
   new_category_parent_selected: function new_category_parent_selected(stats, selected_categorie) {
-    // state.category_parent= category_parent
-    //console.log('category parent selected == ',selected_categorie)
     state.category_parent = selected_categorie;
-    console.log('category parent in store = == ', state.category_parent);
   }
 };
 var actions = {
   set_new_category_name: function set_new_category_name(_ref, category_name) {
     var commit = _ref.commit;
     commit('set_new_category_name', category_name);
-    console.log('category name in action == ', category_name);
   },
   new_category_parent_selected: function new_category_parent_selected(_ref2, selected_categorie) {
     var state = _ref2.state,
         commit = _ref2.commit;
     commit('new_category_parent_selected', selected_categorie);
+  },
+  Add_new_category: function Add_new_category(_ref3) {
+    var state = _ref3.state;
+    var new_category = {
+      name: state.category_name,
+      parent_id: state.category_parent
+    };
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post('/api/categoreis', new_category).then(function (res) {
+      console.log('responce = ', res);
+      state.categoreis.push(new_category);
+    })["catch"](function (err) {
+      console.error('error :', err);
+    });
+  },
+  get_categoreis: function get_categoreis(_ref4) {
+    var state = _ref4.state;
+    axios__WEBPACK_IMPORTED_MODULE_0___default().get('/api/categoreis').then(function (res) {
+      //category was added
+      state.categoreis = res.data.categoreis;
+      console.log('responce = ', res);
+    })["catch"](function (err) {
+      console.error('error :', err);
+    });
   }
 };
 var getters = {};
@@ -20307,7 +20356,7 @@ var render = function() {
       _c(
         "label",
         { staticClass: "font-medium", attrs: { for: "category_name" } },
-        [_vm._v("category name")]
+        [_vm._v("category name ")]
       ),
       _vm._v(" "),
       _c("input", {
@@ -20346,8 +20395,8 @@ var render = function() {
             {
               name: "model",
               rawName: "v-model",
-              value: _vm.selected_categorie,
-              expression: "selected_categorie"
+              value: _vm.parent_category,
+              expression: "parent_category"
             }
           ],
           staticClass:
@@ -20364,7 +20413,7 @@ var render = function() {
                     var val = "_value" in o ? o._value : o.value
                     return val
                   })
-                _vm.selected_categorie = $event.target.multiple
+                _vm.parent_category = $event.target.multiple
                   ? $$selectedVal
                   : $$selectedVal[0]
               },
@@ -20377,14 +20426,15 @@ var render = function() {
             _vm._v("select parent category")
           ]),
           _vm._v(" "),
-          _c("option", { attrs: { value: "2" } }, [_vm._v("option ")]),
-          _vm._v(" "),
-          _c("option", { attrs: { value: "3" } }, [_vm._v("option ")]),
-          _vm._v(" "),
-          _c("option", { attrs: { value: "4" } }, [_vm._v("option ")]),
-          _vm._v(" "),
-          _c("option", { attrs: { value: "5" } }, [_vm._v("option ")])
-        ]
+          _vm._l(_vm.categoreis, function(category) {
+            return _c(
+              "option",
+              { key: category.id, domProps: { value: category.id } },
+              [_vm._v(_vm._s(category.name))]
+            )
+          })
+        ],
+        2
       )
     ]),
     _vm._v(" "),
@@ -20392,7 +20442,8 @@ var render = function() {
       "button",
       {
         staticClass:
-          "px-4 w-full rounded-md bg-blue-200 border border-border-base rounded focus:border-custom-primary h-10 appearance-none focus:outline-none"
+          "px-4 w-full rounded-md bg-blue-200 border border-border-base rounded focus:border-custom-primary h-10 appearance-none focus:outline-none",
+        on: { click: _vm.Add_category }
       },
       [_vm._v("ADD CATEGORY")]
     )
@@ -20436,10 +20487,43 @@ var render = function() {
         )
       ],
       1
-    )
+    ),
+    _vm._v(" "),
+    _c("div", [
+      _c("table", [
+        _vm._m(0),
+        _vm._v(" "),
+        _c(
+          "tbody",
+          _vm._l(_vm.categoreis, function(category) {
+            return _c("tr", { key: category.id }, [
+              _c("td", [_vm._v(_vm._s(category.id))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(category.name))]),
+              _vm._v(" "),
+              _c("td", [_vm._v("delete button")])
+            ])
+          }),
+          0
+        )
+      ])
+    ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("th", [_vm._v("category id")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("category name")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("options")])
+    ])
+  }
+]
 render._withStripped = true
 
 
