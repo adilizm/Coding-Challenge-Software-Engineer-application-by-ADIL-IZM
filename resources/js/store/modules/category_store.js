@@ -9,7 +9,7 @@ const mutations={
     set_new_category_name(state,category_name){
         state.category_name= category_name
      },
-     new_category_parent_selected(stats,selected_categorie){
+     new_category_parent_selected(state,selected_categorie){
        state.category_parent=selected_categorie;
      },
 };

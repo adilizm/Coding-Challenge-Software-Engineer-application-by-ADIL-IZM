@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Product_request;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
 
 class ProductController extends Controller
 {
@@ -14,7 +17,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return 'hello Mr adil';
+        $products= Product::with('Category')->paginate(3);
+        return $products;
     }
 
     /**
@@ -33,11 +37,22 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Product_request $request)
     {
-        $request->validate([
-            
+    
+        $fileName = time() . '_' . Str::slug($request->name, '_') .  '.' . $request['image']->guessExtension();
+        $image_path = $request->file('image')->storeAs('products_images', $fileName, 'public');
+
+        $product= Product::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+            'image' => $image_path,
+            'category_id' => $request->category_id !='null'  ? $request->category_id : null,
         ]);
+        return $product;
+
+        
        
     }
 
