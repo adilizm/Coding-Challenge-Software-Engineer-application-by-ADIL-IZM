@@ -10,16 +10,16 @@
 - 8: run the commande | php artisan serve 
 
 ## how to use CLI
-- 1: create category
+- 1: create category\
     To create category using CLI use the commande : php artisan category:create {name} {parent_id?}
     - name : the category name (requirde)
     - parent_id :it's the parent category id (optional)
     
-- 2: delete category
+- 2: delete category\
     To delete category using CLI use the commande : php artisan category:delete {id}
     - id : category id to delete(requirde)
 
-- 3: create product
+- 3: create product\
     To create product using CLI use the commande : php artisan product:create {--name=} {--price=} {--category=} {--description=} {--image=}
     - name : product name 
     - price :product price
@@ -27,7 +27,7 @@
     - description : description 
     - image :product image (string) 
 
-- 4: delete product
+- 4: delete product\
     To delete product using CLI use the commande : php artisan product:delete {id}
     - id : product id to delete (requirde)
 
