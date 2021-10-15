@@ -2411,7 +2411,12 @@ __webpack_require__.r(__webpack_exports__);
       this.$store.dispatch('product_store/get_index_products', url);
     },
     sort_by_category: function sort_by_category() {
-      console.log('sort by category_id =', this.product_category);
+      if (this.product_category == 'all') {
+        this.$store.dispatch('product_store/get_products');
+      } else {
+        console.log('go get products with category ', this.product_category);
+        this.$store.dispatch('product_store/get_products_of_category', this.product_category);
+      }
     },
     sort_products_DESC: function sort_products_DESC() {
       this.$store.dispatch('product_store/sort_product_Desc');
@@ -2691,6 +2696,10 @@ var mutations = {
     state.products.sort(function (a, b) {
       return a.price - b.price;
     });
+  },
+  get_products_of_category: function get_products_of_category(state, data) {
+    state.products = data.products;
+    state.links = data.links;
   }
 };
 var actions = {
@@ -2764,6 +2773,8 @@ var actions = {
         links: res.data.links
       };
       commit('get_index_products', data);
+    })["catch"](function (err) {
+      return console.error(err);
     });
   },
   sort_product_Desc: function sort_product_Desc(_ref9) {
@@ -2775,6 +2786,27 @@ var actions = {
     var state = _ref10.state,
         commit = _ref10.commit;
     commit('sort_product_Asc');
+  },
+  get_products_of_category: function get_products_of_category(_ref11, category_id) {
+    var state = _ref11.state,
+        commit = _ref11.commit;
+    console.log('dispatch products of category fired');
+    var config = {
+      headers: {
+        "content-type": "application/json"
+      }
+    };
+    var data = new FormData();
+    data.append("category_id", category_id);
+    axios__WEBPACK_IMPORTED_MODULE_0___default().post('/api/get_products_of_category', data, config).then(function (res) {
+      var data = {
+        products: res.data.data,
+        links: res.data.links
+      };
+      commit('get_products_of_category', data);
+    })["catch"](function (err) {
+      return console.error(err);
+    });
   }
 };
 var getters = {};
@@ -21526,7 +21558,9 @@ var render = function() {
                 )
               }),
               _vm._v(" "),
-              _c("option", [_vm._v("show all products")])
+              _c("option", { attrs: { value: "all" } }, [
+                _vm._v("show all products")
+              ])
             ],
             2
           )
@@ -21572,14 +21606,6 @@ var render = function() {
             return _c("tr", { key: product.id }, [
               _c("td", [_vm._v(_vm._s(product.id))]),
               _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.name))]),
-              _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.price))]),
-              _vm._v(" "),
-              product.category[0] != null
-                ? _c("td", [_vm._v(_vm._s(product.category[0].name))])
-                : _c("td", [_vm._v(" -- ")]),
-              _vm._v(" "),
               _c("td", [
                 _c("img", {
                   attrs: {
@@ -21590,6 +21616,14 @@ var render = function() {
                   }
                 })
               ]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(product.name))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(product.price))]),
+              _vm._v(" "),
+              product.category[0] != null
+                ? _c("td", [_vm._v(_vm._s(product.category[0].name))])
+                : _c("td", [_vm._v(" -- ")]),
               _vm._v(" "),
               _c("td", [_vm._v(_vm._s(product.description))])
             ])

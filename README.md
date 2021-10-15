@@ -31,4 +31,3 @@
     To delete product using CLI use the commande : php artisan product:delete {id}
     - id : product id to delete (requirde)
 
-

@@ -6,7 +6,7 @@
             <select id="product_category"  v-model="product_category" @change="sort_by_category"  class="px-4 w-full rounded-md border border-border-base rounded focus:border-custom-primary h-10 appearance-none focus:outline-none">
               <option disabled selected>select category</option>
               <option v-for="category in  categoreis" :key="category.id" :value="category.id" >{{category.name}}</option>
-              <option >show all products</option>
+              <option value="all" >show all products</option>
             </select>
           </div>
           <button class="p-2 m-1 bg-green-400 rounded font-medium"  @click="sort_products_DESC">sort by price desc</button>
@@ -27,11 +27,11 @@
                 <tbody>
                     <tr v-for="product in products" :key="product.id">
                         <td>{{product.id}}</td>
+                        <td> <img :src=" '/storage/' + product.image" width="60" height="60" :alt="product.name" > </td>
                         <td>{{product.name}}</td>
                         <td>{{product.price}}</td>
                         <td v-if="product.category[0] != null">{{product.category[0].name}}</td>
                         <td v-else> -- </td>
-                        <td> <img :src=" '/storage/' + product.image" width="60" height="60" :alt="product.name" > </td>
                         <td>{{product.description}}</td>
                     </tr>
                 </tbody>
@@ -77,13 +77,18 @@ export default {
              this.$store.dispatch('product_store/get_index_products',url)
         },
         sort_by_category(){
-            console.log('sort by category_id =',this.product_category)
+            if(this.product_category == 'all'){
+                this.$store.dispatch('product_store/get_products')
+            }else{
+                console.log('go get products with category ',this.product_category)
+                this.$store.dispatch('product_store/get_products_of_category',this.product_category)
+            }
         },
         sort_products_DESC(){
             this.$store.dispatch('product_store/sort_product_Desc')
-        },sort_products_ASC(){
+        },
+        sort_products_ASC(){
             this.$store.dispatch('product_store/sort_product_Asc')
-
         }
     }
 }

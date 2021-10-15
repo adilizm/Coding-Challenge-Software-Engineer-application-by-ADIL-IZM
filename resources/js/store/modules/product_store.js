@@ -57,6 +57,10 @@ const mutations={
     sort_product_Asc(state){
         state.products.sort((a,b) => a.price - b.price)
     },
+    get_products_of_category(state,data){
+        state.products=data.products
+        state.links=data.links
+    }
 };
 const actions={
     set_new_product_name({state,commit},new_name){
@@ -115,7 +119,8 @@ const actions={
                 links:res.data.links
             }
             commit('get_index_products',data)
-        })
+        }).catch(err=>console.error(err))
+
     },
     sort_product_Desc({state,commit}){
         commit('sort_product_Desc')
@@ -123,6 +128,26 @@ const actions={
     sort_product_Asc({state,commit}){
         commit('sort_product_Asc')
     },
+    get_products_of_category({state,commit},category_id){
+        console.log('dispatch products of category fired')
+        const config = {
+            headers: {
+                "content-type": "application/json",
+            },
+        };
+
+        let data = new FormData();
+        data.append("category_id", category_id);
+
+        axios.post('/api/get_products_of_category',data,config)
+        .then(res=>{
+            let data={
+                products:res.data.data,
+                links:res.data.links
+            }
+            commit('get_products_of_category',data)
+        }).catch(err=>console.error(err))
+    }
 };
 const getters={};
 
