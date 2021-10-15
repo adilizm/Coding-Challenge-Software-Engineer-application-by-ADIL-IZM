@@ -1,5 +1,4 @@
 import axios from "axios";
-import { add, reduce } from "lodash";
 
 const state={
     new_product:{
@@ -31,25 +30,33 @@ const mutations={
     set_new_product_category(state,category){
         state.new_product.category_id=category
     },
-    add_new_product_to_products(state,new_product){
-        state.products.push({
+    add_new_product_to_products(state){
+      /*   state.products.push({
             id:new_product.id,
             name:new_product.name,
             description:new_product.description,
             category_id:new_product.category_id,
             image:new_product.image,
-        })
-        console.log('add new product from commit  products = ', state.products)
+        }) */
+        console.log('new product added ')
     },
     get_products(state,data){
         state.products=data.products
         state.links=data.links
+        console.log('in commit data.products = ',data.products)
         console.log('state.products = ',state.products)
+        console.log('state.links = ',state.links)
     },
     get_index_products(state,data){
         state.products=data.products
         state.links=data.links
-    }
+    },
+    sort_product_Desc(state){
+        state.products.sort((a,b) => b.price - a.price)
+    },
+    sort_product_Asc(state){
+        state.products.sort((a,b) => a.price - b.price)
+    },
 };
 const actions={
     set_new_product_name({state,commit},new_name){
@@ -82,19 +89,20 @@ const actions={
 
        axios.post('/api/products',data,config)
        .then(res=>{
-           console.log('res = ',res)
-           commit('add_new_product_to_products',res.data)
+           commit('add_new_product_to_products')
        })
        .catch(err=>console.error(err))
     },
     get_products({state,commit}){
         axios.get('/api/products')
         .then(res=>{
-            console.log('responce products = ',res)
+            console.log('responce = ',res)
             let data={
                 products:res.data.data,
                 links:res.data.links
             }
+          //  console.log('products ==== ===  = ',data.products)
+           // console.log('links ==== ===  = ',data.links)
             commit('get_products',data)
         })
         .catch(err=>console.error(err))
@@ -109,8 +117,12 @@ const actions={
             commit('get_index_products',data)
         })
     },
-    
-
+    sort_product_Desc({state,commit}){
+        commit('sort_product_Desc')
+    },
+    sort_product_Asc({state,commit}){
+        commit('sort_product_Asc')
+    },
 };
 const getters={};
 

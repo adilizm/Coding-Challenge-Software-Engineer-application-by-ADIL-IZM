@@ -2183,6 +2183,9 @@ __webpack_require__.r(__webpack_exports__);
         return this.$store.state.category_store.categoreis;
       }
     }
+  },
+  created: function created() {
+    this.$store.dispatch('category_store/get_categoreis');
   }
 });
 
@@ -2361,9 +2364,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      product_category: ''
+    };
+  },
   created: function created() {
     this.$store.dispatch('product_store/get_products');
+    this.$store.dispatch('category_store/get_categoreis');
   },
   computed: {
     products: {
@@ -2375,12 +2398,26 @@ __webpack_require__.r(__webpack_exports__);
       get: function get() {
         return this.$store.state.product_store.links;
       }
+    },
+    categoreis: {
+      get: function get() {
+        return this.$store.state.category_store.categoreis;
+      }
     }
   },
   methods: {
     get_index_products: function get_index_products(url) {
       console.log('url == ', url);
       this.$store.dispatch('product_store/get_index_products', url);
+    },
+    sort_by_category: function sort_by_category() {
+      console.log('sort by category_id =', this.product_category);
+    },
+    sort_products_DESC: function sort_products_DESC() {
+      this.$store.dispatch('product_store/sort_product_Desc');
+    },
+    sort_products_ASC: function sort_products_ASC() {
+      this.$store.dispatch('product_store/sort_product_Asc');
     }
   }
 });
@@ -2594,9 +2631,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_1__);
-
 
 var state = {
   new_product: {
@@ -2627,24 +2661,36 @@ var mutations = {
   set_new_product_category: function set_new_product_category(state, category) {
     state.new_product.category_id = category;
   },
-  add_new_product_to_products: function add_new_product_to_products(state, new_product) {
-    state.products.push({
-      id: new_product.id,
-      name: new_product.name,
-      description: new_product.description,
-      category_id: new_product.category_id,
-      image: new_product.image
-    });
-    console.log('add new product from commit  products = ', state.products);
+  add_new_product_to_products: function add_new_product_to_products(state) {
+    /*   state.products.push({
+          id:new_product.id,
+          name:new_product.name,
+          description:new_product.description,
+          category_id:new_product.category_id,
+          image:new_product.image,
+      }) */
+    console.log('new product added ');
   },
   get_products: function get_products(state, data) {
     state.products = data.products;
     state.links = data.links;
+    console.log('in commit data.products = ', data.products);
     console.log('state.products = ', state.products);
+    console.log('state.links = ', state.links);
   },
   get_index_products: function get_index_products(state, data) {
     state.products = data.products;
     state.links = data.links;
+  },
+  sort_product_Desc: function sort_product_Desc(state) {
+    state.products.sort(function (a, b) {
+      return b.price - a.price;
+    });
+  },
+  sort_product_Asc: function sort_product_Asc(state) {
+    state.products.sort(function (a, b) {
+      return a.price - b.price;
+    });
   }
 };
 var actions = {
@@ -2688,8 +2734,7 @@ var actions = {
     data.append("price", state.new_product.price);
     data.append("image", state.new_product.image);
     axios__WEBPACK_IMPORTED_MODULE_0___default().post('/api/products', data, config).then(function (res) {
-      console.log('res = ', res);
-      commit('add_new_product_to_products', res.data);
+      commit('add_new_product_to_products');
     })["catch"](function (err) {
       return console.error(err);
     });
@@ -2698,11 +2743,13 @@ var actions = {
     var state = _ref7.state,
         commit = _ref7.commit;
     axios__WEBPACK_IMPORTED_MODULE_0___default().get('/api/products').then(function (res) {
-      console.log('responce products = ', res);
+      console.log('responce = ', res);
       var data = {
         products: res.data.data,
         links: res.data.links
-      };
+      }; //  console.log('products ==== ===  = ',data.products)
+      // console.log('links ==== ===  = ',data.links)
+
       commit('get_products', data);
     })["catch"](function (err) {
       return console.error(err);
@@ -2718,6 +2765,16 @@ var actions = {
       };
       commit('get_index_products', data);
     });
+  },
+  sort_product_Desc: function sort_product_Desc(_ref9) {
+    var state = _ref9.state,
+        commit = _ref9.commit;
+    commit('sort_product_Desc');
+  },
+  sort_product_Asc: function sort_product_Asc(_ref10) {
+    var state = _ref10.state,
+        commit = _ref10.commit;
+    commit('sort_product_Asc');
   }
 };
 var getters = {};
@@ -21414,12 +21471,89 @@ var render = function() {
   return _c("div", [
     _c(
       "div",
-      { staticClass: "flex justify-end" },
+      { staticClass: "flex justify-end my-2" },
       [
+        _c("div", { staticClass: "flex my-2" }, [
+          _c(
+            "label",
+            { staticClass: "font-medium", attrs: { for: "product_category" } },
+            [_vm._v("sort by category")]
+          ),
+          _vm._v(" "),
+          _c(
+            "select",
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.product_category,
+                  expression: "product_category"
+                }
+              ],
+              staticClass:
+                "px-4 w-full rounded-md border border-border-base rounded focus:border-custom-primary h-10 appearance-none focus:outline-none",
+              attrs: { id: "product_category" },
+              on: {
+                change: [
+                  function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.product_category = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  },
+                  _vm.sort_by_category
+                ]
+              }
+            },
+            [
+              _c("option", { attrs: { disabled: "", selected: "" } }, [
+                _vm._v("select category")
+              ]),
+              _vm._v(" "),
+              _vm._l(_vm.categoreis, function(category) {
+                return _c(
+                  "option",
+                  { key: category.id, domProps: { value: category.id } },
+                  [_vm._v(_vm._s(category.name))]
+                )
+              }),
+              _vm._v(" "),
+              _c("option", [_vm._v("show all products")])
+            ],
+            2
+          )
+        ]),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "p-2 m-1 bg-green-400 rounded font-medium",
+            on: { click: _vm.sort_products_DESC }
+          },
+          [_vm._v("sort by price desc")]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "p-2 m-1 bg-green-400 rounded font-medium",
+            on: { click: _vm.sort_products_ASC }
+          },
+          [_vm._v("sort by price asc")]
+        ),
+        _vm._v(" "),
         _c(
           "router-link",
           {
-            staticClass: "p-2 bg-green-400 rounded font-medium",
+            staticClass: "p-2 m-1 bg-green-400 rounded font-medium",
             attrs: { to: { name: "create_product" } }
           },
           [_vm._v("ADD NEW PRODUCT")]
@@ -21440,7 +21574,11 @@ var render = function() {
               _vm._v(" "),
               _c("td", [_vm._v(_vm._s(product.name))]),
               _vm._v(" "),
-              _c("td", [_vm._v(_vm._s(product.category))]),
+              _c("td", [_vm._v(_vm._s(product.price))]),
+              _vm._v(" "),
+              product.category[0] != null
+                ? _c("td", [_vm._v(_vm._s(product.category[0].name))])
+                : _c("td", [_vm._v(" -- ")]),
               _vm._v(" "),
               _c("td", [
                 _c("img", {
@@ -21465,20 +21603,20 @@ var render = function() {
       _c(
         "div",
         { staticClass: "flex justify-center" },
-        _vm._l(_vm.links, function(link) {
+        _vm._l(_vm.links, function(link, index) {
           return _c(
             "p",
             {
-              key: link.label,
+              key: index,
               staticClass: "my-2 hover:bg-green-200 ",
               on: {
                 click: function($event) {
-                  return _vm.get_index_products(link.url)
+                  return _vm.get_index_products(link)
                 }
               }
             },
             [
-              link.url != null
+              link != null
                 ? _c(
                     "a",
                     {
@@ -21486,7 +21624,7 @@ var render = function() {
                         "mx-2 text-blue-600 font-bold hover:text-green-600 rounded",
                       attrs: { href: "javascript:void(0);" }
                     },
-                    [_vm._v(_vm._s(link.label))]
+                    [_vm._v(_vm._s(index) + " ")]
                   )
                 : _vm._e()
             ]
@@ -21508,6 +21646,8 @@ var staticRenderFns = [
       _c("th", [_vm._v("image")]),
       _vm._v(" "),
       _c("th", [_vm._v("name")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("price")]),
       _vm._v(" "),
       _c("th", [_vm._v("category")]),
       _vm._v(" "),

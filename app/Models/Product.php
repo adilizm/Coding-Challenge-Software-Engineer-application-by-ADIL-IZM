@@ -14,8 +14,4 @@ class Product extends Model
      public function Category(){
         return $this->belongsTo(Category::class);
      }
-     public function set_Category(){
-         $this->attributes['category_id'] =$this->belongsTo(Category::class)->id;
-        $this->attributes['category_name'] =$this->belongsTo(Category::class)->name;
-    }
 }

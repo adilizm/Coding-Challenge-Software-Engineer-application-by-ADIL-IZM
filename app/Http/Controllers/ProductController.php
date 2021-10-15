@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Product_request;
+use App\Http\Resources\ProductsResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -18,7 +19,7 @@ class ProductController extends Controller
     public function index()
     {
         $products= Product::with('Category')->paginate(3);
-        return $products;
+        return  ProductsResource::collection($products);
     }
 
     /**
