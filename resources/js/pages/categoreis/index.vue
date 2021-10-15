@@ -29,6 +29,9 @@ export default {
               return  this.$store.state.category_store.categoreis
             },
         }
+    },
+     created() {
+        this.$store.dispatch('category_store/get_categoreis')
     }
     
 }
